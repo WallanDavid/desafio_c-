@@ -1,0 +1,11 @@
+bin/
+obj/
+**/.vs/
+**/*.user
+**/*.swp
+**/*.suo
+*.user
+*.DS_Store
+Thumbs.db
+KeduPayments/appsettings.Development.json
+KeduPayments/appsettings.Local.json
