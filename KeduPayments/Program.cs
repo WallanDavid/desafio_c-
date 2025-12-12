@@ -3,19 +3,33 @@ using DTOs;
 using Repositories;
 using Services;
 using System.Text.Json.Serialization;
+#if USE_EF
+using Microsoft.EntityFrameworkCore;
+using Persistence;
+#endif
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRouting();
 builder.Services.ConfigureHttpJsonOptions(o => o.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+#if USE_EF
+builder.Services.AddDbContext<KeduDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+builder.Services.AddScoped<IResponsavelRepository, Repositories.EfResponsavelRepository>();
+builder.Services.AddScoped<ICentroDeCustoRepository, Repositories.EfCentroDeCustoRepository>();
+builder.Services.AddScoped<IPlanoRepository, Repositories.EfPlanoRepository>();
+builder.Services.AddScoped<ICobrancaRepository, Repositories.EfCobrancaRepository>();
+builder.Services.AddScoped<IPagamentoService, Services.PagamentoEfService>();
+builder.Services.AddSingleton<IPaymentCodeGenerator, Services.PaymentCodeGenerator>();
+#else
 builder.Services.AddSingleton<Repositories.InMemoryStore>();
-builder.Services.AddSingleton<Repositories.IResponsavelRepository, Repositories.InMemoryResponsavelRepository>();
-builder.Services.AddSingleton<Repositories.ICentroDeCustoRepository, Repositories.InMemoryCentroDeCustoRepository>();
-builder.Services.AddSingleton<Repositories.IPlanoRepository, Repositories.InMemoryPlanoRepository>();
-builder.Services.AddSingleton<Repositories.ICobrancaRepository, Repositories.InMemoryCobrancaRepository>();
-builder.Services.AddSingleton<Services.IPagamentoService, Services.PagamentoService>();
-builder.Services.AddSingleton<Services.IPaymentCodeGenerator, Services.PaymentCodeGenerator>();
+builder.Services.AddSingleton<IResponsavelRepository, Repositories.InMemoryResponsavelRepository>();
+builder.Services.AddSingleton<ICentroDeCustoRepository, Repositories.InMemoryCentroDeCustoRepository>();
+builder.Services.AddSingleton<IPlanoRepository, Repositories.InMemoryPlanoRepository>();
+builder.Services.AddSingleton<ICobrancaRepository, Repositories.InMemoryCobrancaRepository>();
+builder.Services.AddSingleton<IPagamentoService, Services.PagamentoService>();
+builder.Services.AddSingleton<IPaymentCodeGenerator, Services.PaymentCodeGenerator>();
+#endif
 
 var app = builder.Build();
 
