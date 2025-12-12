@@ -150,6 +150,19 @@ app.MapPost("/cobrancas/{id:int}/pagamentos", (int id, RegistrarPagamentoDto dto
     }
 });
 
+app.MapPost("/cobrancas/{id:int}/cancelar", (int id, ICobrancaRepository repo) =>
+{
+    var c = repo.Get(id);
+    if (c is null) return Results.NotFound();
+    c.Status = StatusCobranca.CANCELADA;
+    repo.Update(c);
+    return Results.Ok(new
+    {
+        c.Id,
+        c.Status
+    });
+});
+
 app.Run();
 
 public partial class Program { }
