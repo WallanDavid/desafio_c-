@@ -151,3 +151,5 @@ app.MapPost("/cobrancas/{id:int}/pagamentos", (int id, RegistrarPagamentoDto dto
 });
 
 app.Run();
+
+public partial class Program { }
